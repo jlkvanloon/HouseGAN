@@ -16,8 +16,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 from PIL import Image, ImageDraw, ImageOps
+
+from models.dicriminator import Discriminator
+from models.generator import Generator
+from models.gradient_penalty import compute_gradient_penalty
 from utils import combine_images_maps, rectangle_renderer
-from models import Discriminator, Generator, compute_gradient_penalty, weights_init_normal
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_epochs", type=int, default=1000000, help="number of epochs of training")

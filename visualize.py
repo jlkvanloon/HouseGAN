@@ -18,12 +18,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.autograd as autograd
 import torch
+
+from models.generator import Generator
 from utils import bb_to_img, bb_to_vec, bb_to_seg
 from PIL import Image, ImageDraw
 from MyIP import reconstructFloorplan
 import svgwrite
 from input_graphs import *
-from models import Generator
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
