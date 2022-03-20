@@ -1,31 +1,25 @@
 import argparse
 import os
 import numpy as np
-import math
-import sys
-import random
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
 
 from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn
-from torch.utils.data import DataLoader
-from torchvision import datasets
 from torch.autograd import Variable
 
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
 import torch
 from PIL import Image, ImageDraw
 
 from models.generator import Generator
 from reconstruct import reconstructFloorplan
 import svgwrite
-from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, remove_junctions, ID_COLOR
+
+from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import networkx as nx
+import common_functions
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
@@ -44,13 +38,6 @@ exp_name = 'exp_with_graph_global_new'
 target_set = 'E'
 phase='eval'
 checkpoint = './checkpoints/{}_{}_{}.pth'.format(exp_name, target_set, numb_iters)
-
-def pad_im(cr_im, final_size=256, bkg_color='white'):    
-    new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
-    padded_im = Image.new('RGB', (new_size, new_size), 'white')
-    padded_im.paste(cr_im, ((new_size-cr_im.size[0])//2, (new_size-cr_im.size[1])//2))
-    padded_im = padded_im.resize((final_size, final_size), Image.ANTIALIAS)
-    return padded_im
 
 def draw_graph(g_true):
     # build true graph 
@@ -71,23 +58,9 @@ def draw_graph(g_true):
     plt.tight_layout()
     plt.savefig('./dump/_true_graph.jpg', format="jpg")
     rgb_im = Image.open('./dump/_true_graph.jpg')
-    rgb_arr = np.array(pad_im(rgb_im))/255.0
+    rgb_arr = np.array(common_functions.pad_im(rgb_im, final_size=256))/255.0
     return rgb_arr
 
-def draw_floorplan(dwg, junctions, juncs_on, lines_on):
-
-    # draw edges
-    for k, l in lines_on:
-        x1, y1 = np.array(junctions[k])
-        x2, y2 = np.array(junctions[l])
-        #fill='rgb({},{},{})'.format(*(np.random.rand(3)*255).astype('int'))
-        dwg.add(dwg.line((float(x1), float(y1)), (float(x2), float(y2)), stroke='black', stroke_width=4, opacity=1.0))
-
-    # draw corners
-    for j in juncs_on:
-        x, y = np.array(junctions[j])
-        dwg.add(dwg.circle(center=(float(x), float(y)), r=3, stroke='red', fill='white', stroke_width=2, opacity=1.0))
-    return 
 
 # Create folder
 os.makedirs(opt.exp_folder, exist_ok=True)
@@ -157,7 +130,7 @@ for i, batch in enumerate(fp_loader):
             # draw vector
             dwg = svgwrite.Drawing('./svg/floorplan_vec_{}.svg'.format(globalIndex), (256, 256))
             dwg.add(svgwrite.image.Image(os.path.abspath('./rooms/{}_rooms_updated.png'.format(globalIndex)), size=(256, 256)))      
-            draw_floorplan(dwg, real_junctions, real_juncs_on, real_lines_on)
+            common_functions.draw_floorplan(dwg, real_junctions, real_juncs_on, real_lines_on)
             dwg.save()
 
             print('running inkscape ...')
@@ -176,7 +149,7 @@ for i, batch in enumerate(fp_loader):
         # draw vector
         dwg = svgwrite.Drawing('./svg/floorplan_vec_{}.svg'.format(globalIndex), (256, 256))
         dwg.add(svgwrite.image.Image(os.path.abspath('./rooms/{}_rooms_updated.png'.format(globalIndex)), size=(256, 256)))      
-        draw_floorplan(dwg, junctions, juncs_on, lines_on)
+        common_functions.draw_floorplan(dwg, junctions, juncs_on, lines_on)
         dwg.save()
         
         print('running inkscape ...')
