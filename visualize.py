@@ -23,7 +23,14 @@ opt = parser.parse_args()
 print(opt)
 
 def draw_floorplan(dwg, junctions, juncs_on, lines_on):
-
+    """
+    TODO this function used nowhere...
+    :param dwg:
+    :param junctions:
+    :param juncs_on:
+    :param lines_on:
+    :return:
+    """
     # draw edges
     for k, l in lines_on:
         x1, y1 = np.array(junctions[k])/2.0
@@ -40,7 +47,7 @@ def draw_floorplan(dwg, junctions, juncs_on, lines_on):
 # Create folder
 os.makedirs(opt.exp_folder, exist_ok=True)
 
-# Initialize generator and discriminator
+# Initialize generator
 generator = Generator(opt.with_boundary)
 generator.load_state_dict(torch.load(opt.checkpoint))
 generator.eval()
@@ -66,71 +73,38 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 globalIndex = 0
 # np.random.seed(100)
 
-# Generate Mod 1
-boundary_bb = Variable(torch.tensor(in_boundary_1).type(Tensor))
-nodes = torch.tensor(in_nodes_1)
-triples = torch.tensor(in_triples_1)
-room_to_sample = torch.tensor(np.zeros((nodes.shape[0])))
-triple_to_sample = torch.tensor(np.zeros((triples.shape[0])))
+
+def generate_mod(in_boundary, in_nodes, in_triples, latent_space_init=None, verbose=False):
+    """
+    TODO
+    :param in_boundary: TODO
+    :param in_nodes: TODO
+    :param in_triples: TODO
+    :param latent_space_init: Initialization of the latent space.
+    :param verbose: Set to true to print the latent space.
+    :return: TODO
+    """
+    if latent_space_init is None:
+        latent_space_init = Variable(Tensor(np.random.normal(0, 1, (1, opt.latent_dim))))
+    boundary_bb = Variable(torch.tensor(in_boundary).type(Tensor))
+    nodes = torch.tensor(in_nodes)
+    triples = torch.tensor(in_triples)
+    room_to_sample = torch.tensor(np.zeros((nodes.shape[0])))
+    triple_to_sample = torch.tensor(np.zeros((triples.shape[0])))
+    gen_room_bb = generator(latent_space_init, [nodes, triples], room_to_sample, boundary=boundary_bb)
+    gen_imgs_tensor = bb_to_img(gen_room_bb.data, [nodes, triples], room_to_sample, triple_to_sample)
+    if verbose:
+        print(latent_space_init)
+    return gen_imgs_tensor
+
+
 z = Variable(Tensor(np.random.normal(0, 1, (1, opt.latent_dim))))
-gen_room_bb = generator(z, [nodes, triples], room_to_sample, boundary=boundary_bb)
-gen_imgs_tensor_1 = bb_to_img(gen_room_bb.data, [nodes, triples], room_to_sample, triple_to_sample)
-print(z)
-
-# Generate Mod 2
-boundary_bb = Variable(torch.tensor(in_boundary_2).type(Tensor))
-nodes = torch.tensor(in_nodes_2)
-triples = torch.tensor(in_triples_2)
-room_to_sample = torch.tensor(np.zeros((nodes.shape[0])))
-triple_to_sample = torch.tensor(np.zeros((triples.shape[0])))
-# z = Variable(Tensor(np.random.normal(0, 1, (1, opt.latent_dim))))
-gen_room_bb = generator(z, [nodes, triples], room_to_sample, boundary=boundary_bb)
-gen_imgs_tensor_2 = bb_to_img(gen_room_bb.data, [nodes, triples], room_to_sample, triple_to_sample)
-print(z)
-
-# Generate Mod 3
-boundary_bb = Variable(torch.tensor(in_boundary_3).type(Tensor))
-nodes = torch.tensor(in_nodes_3)
-triples = torch.tensor(in_triples_3)
-room_to_sample = torch.tensor(np.zeros((nodes.shape[0])))
-triple_to_sample = torch.tensor(np.zeros((triples.shape[0])))
-# z = Variable(Tensor(np.random.normal(0, 1, (1, opt.latent_dim))))
-gen_room_bb = generator(z, [nodes, triples], room_to_sample, boundary=boundary_bb)
-gen_imgs_tensor_3 = bb_to_img(gen_room_bb.data, [nodes, triples], room_to_sample, triple_to_sample)
-print(z)
-
-# Generate Mod 4
-boundary_bb = Variable(torch.tensor(in_boundary_4).type(Tensor))
-nodes = torch.tensor(in_nodes_4)
-triples = torch.tensor(in_triples_4)
-room_to_sample = torch.tensor(np.zeros((nodes.shape[0])))
-triple_to_sample = torch.tensor(np.zeros((triples.shape[0])))
-# z = Variable(Tensor(np.random.normal(0, 1, (1, opt.latent_dim))))
-gen_room_bb = generator(z, [nodes, triples], room_to_sample, boundary=boundary_bb)
-gen_imgs_tensor_4 = bb_to_img(gen_room_bb.data, [nodes, triples], room_to_sample, triple_to_sample)
-print(z)
-
-# Generate Mod 5
-boundary_bb = Variable(torch.tensor(in_boundary_5).type(Tensor))
-nodes = torch.tensor(in_nodes_5)
-triples = torch.tensor(in_triples_5)
-room_to_sample = torch.tensor(np.zeros((nodes.shape[0])))
-triple_to_sample = torch.tensor(np.zeros((triples.shape[0])))
-# z = Variable(Tensor(np.random.normal(0, 1, (1, opt.latent_dim))))
-gen_room_bb = generator(z, [nodes, triples], room_to_sample, boundary=boundary_bb)
-gen_imgs_tensor_5 = bb_to_img(gen_room_bb.data, [nodes, triples], room_to_sample, triple_to_sample)
-print(z)
-
-# Generate Mod 6
-boundary_bb = Variable(torch.tensor(in_boundary_6).type(Tensor))
-nodes = torch.tensor(in_nodes_6)
-triples = torch.tensor(in_triples_6)
-room_to_sample = torch.tensor(np.zeros((nodes.shape[0])))
-triple_to_sample = torch.tensor(np.zeros((triples.shape[0])))
-# z = Variable(Tensor(np.random.normal(0, 1, (1, opt.latent_dim))))
-gen_room_bb = generator(z, [nodes, triples], room_to_sample, boundary=boundary_bb)
-gen_imgs_tensor_6 = bb_to_img(gen_room_bb.data, [nodes, triples], room_to_sample, triple_to_sample)
-print(z)
+gen_imgs_tensor_1 = generate_mod(in_boundary_1, in_nodes_1, in_triples_1, latent_space_init=z)
+gen_imgs_tensor_2 = generate_mod(in_boundary_2, in_nodes_2, in_triples_2, latent_space_init=z)
+gen_imgs_tensor_3 = generate_mod(in_boundary_3, in_nodes_3, in_triples_3, latent_space_init=z)
+gen_imgs_tensor_4 = generate_mod(in_boundary_4, in_nodes_4, in_triples_4, latent_space_init=z)
+gen_imgs_tensor_5 = generate_mod(in_boundary_5, in_nodes_5, in_triples_5, latent_space_init=z)
+gen_imgs_tensor_6 = generate_mod(in_boundary_6, in_nodes_6, in_triples_6, latent_space_init=z)
 
 # Save all images
 all_imgs = torch.cat([gen_imgs_tensor_1, gen_imgs_tensor_2, gen_imgs_tensor_3, gen_imgs_tensor_4, gen_imgs_tensor_5, gen_imgs_tensor_6])
