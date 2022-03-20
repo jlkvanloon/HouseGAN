@@ -1,29 +1,23 @@
 import argparse
 import os
 import numpy as np
-import math
-import sys
-import random
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
 
 from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn
-from torch.utils.data import DataLoader
-from torchvision import datasets
 from torch.autograd import Variable
 
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
+
 import torch
 from PIL import Image, ImageDraw
 
 from models.generator import Generator
 from reconstruct import reconstructFloorplan
 import svgwrite
-from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, remove_junctions, ID_COLOR, bb_to_im_fid
+from utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid
 from collections import defaultdict
+
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -73,20 +67,6 @@ def draw_graph(g_true):
     rgb_arr = np.array(pad_im(rgb_im))/255.0
     return rgb_arr
 
-def draw_floorplan(dwg, junctions, juncs_on, lines_on):
-
-    # draw edges
-    for k, l in lines_on:
-        x1, y1 = np.array(junctions[k])
-        x2, y2 = np.array(junctions[l])
-        #fill='rgb({},{},{})'.format(*(np.random.rand(3)*255).astype('int'))
-        dwg.add(dwg.line((float(x1), float(y1)), (float(x2), float(y2)), stroke='black', stroke_width=4, opacity=1.0))
-
-    # draw corners
-    for j in juncs_on:
-        x, y = np.array(junctions[j])
-        dwg.add(dwg.circle(center=(float(x), float(y)), r=3, stroke='red', fill='white', stroke_width=2, opacity=1.0))
-    return 
 
 # Create folder
 os.makedirs(opt.exp_folder, exist_ok=True)
@@ -143,12 +123,6 @@ for i, batch in enumerate(fp_loader):
         if k == 0:
             graph_arr = draw_graph([real_nodes, eds.detach().cpu().numpy()])
             final_images.append(torch.tensor(graph_arr))
-            
-#             # place real 
-#             real_bbs = real_bbs[np.newaxis, :, :]/32.0
-#             real_im = bb_to_im_fid(real_bbs, real_nodes)
-#             rgb_arr = np.array(real_im)
-#             final_images.append(torch.tensor(rgb_arr/255.0))
             
             
         # reconstruct        
