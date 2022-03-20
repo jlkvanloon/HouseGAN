@@ -22,7 +22,6 @@ from PIL import Image, ImageDraw
 from reconstruct import reconstructFloorplan
 import svgwrite
 
-from models import Generator
 import networkx as nx
 import matplotlib.pyplot as plt
 from utils import ID_COLOR

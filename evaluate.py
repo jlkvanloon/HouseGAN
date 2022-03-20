@@ -18,12 +18,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.autograd as autograd
 import torch
+
+from models.generator import Generator
 from utils import bb_to_img, bb_to_vec, bb_to_seg
 from PIL import Image, ImageDraw
 from MyIP import reconstructFloorplan
 import svgwrite
 
-from models import Generator
 import networkx as nx
 import matplotlib.pyplot as plt
 from utils import ID_COLOR
