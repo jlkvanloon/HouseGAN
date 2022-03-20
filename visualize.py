@@ -1,27 +1,11 @@
 import argparse
 import os
 import numpy as np
-import math
-import sys
-import random
-
-import torchvision.transforms as transforms
 from torchvision.utils import save_image
-
 from floorplan_dataset_no_masks import FloorplanGraphDataset, floorplan_collate_fn
-from torch.utils.data import DataLoader
-from torchvision import datasets
 from torch.autograd import Variable
-from graph import GraphTripleConv, GraphTripleConvNet
-
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
 import torch
-from utils import bb_to_img, bb_to_vec, bb_to_seg
-from PIL import Image, ImageDraw
-from MyIP import reconstructFloorplan
-import svgwrite
+from utils import bb_to_img
 from input_graphs import *
 from models import Generator
 
