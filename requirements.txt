@@ -1,0 +1,13 @@
+Pillow
+imageio
+networkx
+numpy
+opencv-python
+pygraphviz
+scikit-image
+scipy
+svgwrite
+webcolors
+matplotlib
+torch
+torchvision
