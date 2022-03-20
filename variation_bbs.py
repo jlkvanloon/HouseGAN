@@ -20,6 +20,7 @@ from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import common_functions
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
@@ -37,13 +38,6 @@ exp_name = 'exp_with_graph_global_new'
 target_set = 'E'
 phase='eval'
 checkpoint = './checkpoints/{}_{}_{}.pth'.format(exp_name, target_set, numb_iters)
-
-def pad_im(cr_im, final_size=299, bkg_color='white'):    
-    new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
-    padded_im = Image.new('RGB', (new_size, new_size), 'white')
-    padded_im.paste(cr_im, ((new_size-cr_im.size[0])//2, (new_size-cr_im.size[1])//2))
-    padded_im = padded_im.resize((final_size, final_size), Image.ANTIALIAS)
-    return padded_im
 
 def draw_graph(g_true):
     # build true graph 
@@ -64,7 +58,7 @@ def draw_graph(g_true):
     plt.tight_layout()
     plt.savefig('./dump/_true_graph.jpg', format="jpg")
     rgb_im = Image.open('./dump/_true_graph.jpg')
-    rgb_arr = np.array(pad_im(rgb_im))/255.0
+    rgb_arr = np.array(common_functions.pad_im(rgb_im))/255.0
     return rgb_arr
 
 

@@ -1,4 +1,7 @@
 import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+from PIL import Image
 
 #this file contains functions common to multiple files in the repository
 
@@ -25,6 +28,25 @@ def draw_floorplan(dwg, junctions, juncs_on, lines_on):
         x, y = np.array(junctions[j])
         dwg.add(dwg.circle(center=(float(x), float(y)), r=3, stroke='red', fill='white', stroke_width=2, opacity=1.0))
 
+
+# Comment Author: Varnika
+# function pad_im is common among:
+# variation_bbs_with_target_graph_segments_suppl.py - final_size=256
+# vectorize.py - final_size = 256
+# variation_bbs_with_target_graph_segments.py - final_size=299
+# variation_bbs_with_target graph.py - final_size=299
+# variation_bbs.py - final_size=299
+# variation_bbs_with_target_graph.py - final_size=299
+
+
+def pad_im(cr_im, final_size=299, bkg_color='white'):
+    new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
+    padded_im = Image.new('RGB', (new_size, new_size), 'white')
+    padded_im.paste(cr_im, ((new_size - cr_im.size[0]) // 2, (new_size - cr_im.size[1]) // 2))
+    padded_im = padded_im.resize((final_size, final_size), Image.ANTIALIAS)
+    return padded_im
+
+
 #Comment Author: Varnika
 # The following files have the same draw_graph function:
     # variation_bbs_with_target_graph_segments.py
@@ -32,7 +54,9 @@ def draw_floorplan(dwg, junctions, juncs_on, lines_on):
     # variation_bbs_with_target_graph.py
 
 #In variation_bbs.py - draw_graph is quite different from the above function so the function is kept as is.
-def draw_graph(g_true):
+
+#draw_graph needs pad_im function
+def draw_graph(g_true, final_size=299):
     # build true graph
     G_true = nx.Graph()
     colors_H = []
@@ -55,7 +79,7 @@ def draw_graph(g_true):
     plt.tight_layout()
     plt.savefig('./dump/_true_graph.jpg', format="jpg")
     rgb_im = Image.open('./dump/_true_graph.jpg')
-    rgb_arr = pad_im(rgb_im)
+    rgb_arr = pad_im(rgb_im,final_size)
     return rgb_arr
 
 

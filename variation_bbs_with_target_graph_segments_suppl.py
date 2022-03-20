@@ -47,13 +47,6 @@ phase='eval'
 checkpoint = './data/{}_{}_{}.pth'.format(exp_name, target_set, numb_iters)
 os.makedirs("./dump/", exist_ok=True)
 os.makedirs("./output/", exist_ok=True)
-
-def pad_im(cr_im, final_size=256, bkg_color='white'):    
-    new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
-    padded_im = Image.new('RGB', (new_size, new_size), 'white')
-    padded_im.paste(cr_im, ((new_size-cr_im.size[0])//2, (new_size-cr_im.size[1])//2))
-    padded_im = padded_im.resize((final_size, final_size), Image.ANTIALIAS)
-    return padded_im
         
 import cv2
 import webcolors
@@ -158,7 +151,8 @@ for i, batch in enumerate(fp_loader):
         
         if k == 0:
             #original file has 'convert('RGBA')' in the draw_graph function
-            graph_arr = common_functions.draw_graph([real_nodes, eds.detach().cpu().numpy()]).convert('RGBA')
+            #final_size here is 256, it is needed for the pad_im function
+            graph_arr = common_functions.draw_graph([real_nodes, eds.detach().cpu().numpy()], final_size=256).convert('RGBA')
             final_images.append(graph_arr)
             
             

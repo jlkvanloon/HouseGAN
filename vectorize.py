@@ -39,13 +39,6 @@ target_set = 'E'
 phase='eval'
 checkpoint = './checkpoints/{}_{}_{}.pth'.format(exp_name, target_set, numb_iters)
 
-def pad_im(cr_im, final_size=256, bkg_color='white'):    
-    new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
-    padded_im = Image.new('RGB', (new_size, new_size), 'white')
-    padded_im.paste(cr_im, ((new_size-cr_im.size[0])//2, (new_size-cr_im.size[1])//2))
-    padded_im = padded_im.resize((final_size, final_size), Image.ANTIALIAS)
-    return padded_im
-
 def draw_graph(g_true):
     # build true graph 
     G_true = nx.Graph()
@@ -65,7 +58,7 @@ def draw_graph(g_true):
     plt.tight_layout()
     plt.savefig('./dump/_true_graph.jpg', format="jpg")
     rgb_im = Image.open('./dump/_true_graph.jpg')
-    rgb_arr = np.array(pad_im(rgb_im))/255.0
+    rgb_arr = np.array(common_functions.pad_im(rgb_im, final_size=256))/255.0
     return rgb_arr
 
 
