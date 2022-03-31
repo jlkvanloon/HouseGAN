@@ -1,48 +1,22 @@
-import argparse
 import os
+import os
+
+import cv2
+import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
-import math
-import sys
-import random
-
-import torchvision.transforms as transforms
-from torchvision.utils import save_image
-
-from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torch.autograd import Variable
-
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
 import torch
+import webcolors
 from PIL import Image, ImageDraw
-
-from models.generator import Generator
-from reconstruct import reconstructFloorplan
-import svgwrite
+from torch.autograd import Variable
 
 from run_initialization_utils import parse_input_options, get_generator_from_checkpoint, \
     get_floorplan_dataset_loader_eval
-from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, remove_junctions, ID_COLOR, bb_to_im_fid
-from collections import defaultdict
-import cv2
-import webcolors
-import matplotlib.pyplot as plt
-import networkx as nx
-
-
-def pad_im(cr_im, final_size=299, bkg_color='white'):
-    new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
-    padded_im = Image.new('RGB', (new_size, new_size), 'white')
-    padded_im.paste(cr_im, ((new_size - cr_im.size[0]) // 2, (new_size - cr_im.size[1]) // 2))
-    padded_im = padded_im.resize((final_size, final_size), Image.ANTIALIAS)
-    return padded_im
+from utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
 
 
 def draw_graph(g_true):
-    # build true graph 
+    # build true graph
     G_true = nx.Graph()
     colors_H = []
     for k, label in enumerate(g_true[0]):

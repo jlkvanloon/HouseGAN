@@ -1,34 +1,18 @@
 import argparse
-import os
-import numpy as np
-import math
-import sys
-import random
-
-import torchvision.transforms as transforms
-from torchvision.utils import save_image
-
-from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn, is_adjacent
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torch.autograd import Variable
-
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
-import torch
-
-from models.generator import Generator
-from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb
-from PIL import Image, ImageDraw
-from reconstruct import reconstructFloorplan
-import svgwrite
+from collections import defaultdict
 
 import networkx as nx
-import matplotlib.pyplot as plt
-from utils import ID_COLOR
+import numpy as np
+import torch
+import torchvision.transforms as transforms
+from torch.autograd import Variable
+from torch.utils.data import DataLoader
 from tqdm import tqdm
-from collections import defaultdict
+
+from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn, is_adjacent
+from models.generator import Generator
+from utils import ID_COLOR
+from utils import mask_to_bb
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
@@ -188,9 +172,7 @@ def run_parallel(graphs):
     # Compute in parallel
     from joblib import Parallel, delayed
     import multiprocessing
-    import time
     import functools
-    import threading
     def with_timeout(timeout):
         def decorator(decorated):
             @functools.wraps(decorated)
@@ -217,9 +199,7 @@ def run_parallel(graphs):
     num_cores = multiprocessing.cpu_count()
     
     results = []
-#     lower = 0
-#     upper = 2500
-    
+
     lower = 0
     upper = 1000
     

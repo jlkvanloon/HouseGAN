@@ -10,15 +10,7 @@ from torch.autograd import Variable
 
 from run_initialization_utils import get_floorplan_dataset_loader_eval, get_generator_from_checkpoint, \
     parse_input_options
-from utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid
-
-
-def pad_im(cr_im, final_size=299, bkg_color='white'):
-    new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
-    padded_im = Image.new('RGB', (new_size, new_size), 'white')
-    padded_im.paste(cr_im, ((new_size - cr_im.size[0]) // 2, (new_size - cr_im.size[1]) // 2))
-    padded_im = padded_im.resize((final_size, final_size), Image.ANTIALIAS)
-    return padded_im
+from utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
 
 
 def draw_graph(g_true):
