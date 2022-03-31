@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
-from run_initialization import parse_input_options, get_generator_from_checkpoint, get_floorplan_dataset_loader_eval
+from run_initialization_utils import parse_input_options, get_generator_from_checkpoint, get_floorplan_dataset_loader_eval
 from utils import mask_to_bb, bb_to_im_fid
 
 # Create folder
@@ -53,7 +53,7 @@ for i, batch in enumerate(fp_loader):
             real_im.save('{}/{}.jpg'.format('./FID/real', globalIndexReal))
             globalIndexReal += 1
 
-        # draw vector
+        # Draw vector
         gen_bbs = gen_bbs[np.newaxis, :, :] / 32.0
         fake_im = bb_to_im_fid(gen_bbs, real_nodes)
         fake_im.save('{}/{}.jpg'.format('./FID/fake', globalIndexFake))

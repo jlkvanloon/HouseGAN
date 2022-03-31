@@ -1,50 +1,20 @@
-import argparse
 import os
-import numpy as np
-import math
-import sys
-import random
+import os
 
-import torchvision.transforms as transforms
-from torchvision.utils import save_image
-
-from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torch.autograd import Variable
-
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
-import torch
-from PIL import Image, ImageDraw
-
-from models.generator import Generator
-from reconstruct import reconstructFloorplan
-import svgwrite
-from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, remove_junctions, ID_COLOR, bb_to_im_fid
-from collections import defaultdict
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
+import torch
+from PIL import Image
+from torch.autograd import Variable
+from torchvision.utils import save_image
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
-parser.add_argument("--latent_dim", type=int, default=128, help="dimensionality of the latent space")
-parser.add_argument("--batch_size", type=int, default=1, help="size of the batches")
-parser.add_argument("--channels", type=int, default=1, help="number of image channels")
-parser.add_argument("--num_variations", type=int, default=100, help="number of variations")
-parser.add_argument("--exp_folder", type=str, default='exp', help="destination folder")
+from run_initialization_utils import get_floorplan_dataset_loader_eval, get_generator_from_checkpoint, \
+    parse_input_options
+from utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid
 
-opt = parser.parse_args()
-print(opt)
 
-numb_iters = 200000
-exp_name = 'exp_with_graph_global_new'
-target_set = 'E'
-phase='eval'
-checkpoint = './checkpoints/{}_{}_{}.pth'.format(exp_name, target_set, numb_iters)
-
-def pad_im(cr_im, final_size=299, bkg_color='white'):    
+def pad_im(cr_im, final_size=299):
     new_size = int(np.max([np.max(list(cr_im.size)), final_size]))
     padded_im = Image.new('RGB', (new_size, new_size), 'white')
     padded_im.paste(cr_im, ((new_size-cr_im.size[0])//2, (new_size-cr_im.size[1])//2))
@@ -74,7 +44,6 @@ def draw_graph(g_true):
     return rgb_arr
 
 def draw_floorplan(dwg, junctions, juncs_on, lines_on):
-
     # draw edges
     for k, l in lines_on:
         x1, y1 = np.array(junctions[k])
@@ -88,25 +57,13 @@ def draw_floorplan(dwg, junctions, juncs_on, lines_on):
         dwg.add(dwg.circle(center=(float(x), float(y)), r=3, stroke='red', fill='white', stroke_width=2, opacity=1.0))
     return 
 
-# Create folder
+opt = parse_input_options()
+generator = get_generator_from_checkpoint()
+fp_loader = get_floorplan_dataset_loader_eval(opt)
 os.makedirs(opt.exp_folder, exist_ok=True)
 
-# Initialize generator and discriminator
-generator = Generator()
-generator.load_state_dict(torch.load(checkpoint))
-
-# Initialize variables
-cuda = True if torch.cuda.is_available() else False
-if cuda:
-    generator.cuda()
-rooms_path = '/local-scratch4/nnauata/autodesk/FloorplanDataset/'
-
-# Initialize dataset iterator
-fp_dataset_test = FloorplanGraphDataset(rooms_path, transforms.Normalize(mean=[0.5], std=[0.5]), target_set=target_set, split=phase)
-fp_loader = torch.utils.data.DataLoader(fp_dataset_test, 
-                                        batch_size=opt.batch_size, 
-                                        shuffle=True, collate_fn=floorplan_collate_fn)
 # Optimizers
+cuda = True if torch.cuda.is_available() else False
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
 # ------------
@@ -143,18 +100,11 @@ for i, batch in enumerate(fp_loader):
         if k == 0:
             graph_arr = draw_graph([real_nodes, eds.detach().cpu().numpy()])
             final_images.append(torch.tensor(graph_arr))
-            
-#             # place real 
-#             real_bbs = real_bbs[np.newaxis, :, :]/32.0
-#             real_im = bb_to_im_fid(real_bbs, real_nodes)
-#             rgb_arr = np.array(real_im)
-#             final_images.append(torch.tensor(rgb_arr/255.0))
-            
-            
-        # reconstruct        
+
+        # reconstruct
         fake_im = bb_to_im_fid(gen_bbs, real_nodes)
         rgb_arr = np.array(fake_im)
         final_images.append(torch.tensor(rgb_arr/255.0))
         
 final_images = torch.stack(final_images).transpose(1, 3)
-save_image(final_images, "./output/rendered_{}.png".format(target_set), nrow=opt.num_variations+1)
+save_image(final_images, "./output/rendered_D.png", nrow=opt.num_variations+1)
