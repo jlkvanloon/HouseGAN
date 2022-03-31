@@ -1,4 +1,3 @@
-import argparse
 from collections import defaultdict
 
 import networkx as nx
@@ -11,7 +10,7 @@ from tqdm import tqdm
 
 from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn, is_adjacent
 from models.generator import Generator
-from run_initialization_utils import parse_input_options
+from utils.run_initialization_utils import parse_input_options
 from utils import ID_COLOR
 from utils import mask_to_bb
 

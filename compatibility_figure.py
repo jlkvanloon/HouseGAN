@@ -7,7 +7,7 @@ import torch
 from PIL import Image
 from torch.autograd import Variable
 
-from run_initialization_utils import get_generator_from_checkpoint, parse_input_options, \
+from utils.run_initialization_utils import get_generator_from_checkpoint, parse_input_options, \
     get_floorplan_dataset_loader_eval
 from utils import mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
 

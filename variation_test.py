@@ -1,35 +1,21 @@
-import argparse
-import os
 import numpy as np
-import math
-import sys
-import random
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
 
 from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn, is_adjacent
 from torch.utils.data import DataLoader
-from torchvision import datasets
 from torch.autograd import Variable
 
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
 import torch
 
 from models.generator import Generator
-from run_initialization_utils import parse_input_options
-from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, draw_graph
+from utils.run_initialization_utils import parse_input_options
+from utils import mask_to_bb, draw_graph
 from PIL import Image, ImageDraw
-from reconstruct import reconstructFloorplan
-import svgwrite
 
-import networkx as nx
-import matplotlib.pyplot as plt
 from utils import ID_COLOR
 from tqdm import tqdm
-from collections import defaultdict
 
 opt = parse_input_options()
 

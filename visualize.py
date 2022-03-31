@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 
 from models.generator import Generator
-from run_initialization_utils import parse_input_options
+from utils.run_initialization_utils import parse_input_options
 from utils import bb_to_img
 
 opt = parse_input_options()

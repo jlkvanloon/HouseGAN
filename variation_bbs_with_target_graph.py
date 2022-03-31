@@ -1,5 +1,4 @@
 import os
-import os
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -8,7 +7,7 @@ import torch
 from PIL import Image
 from torch.autograd import Variable
 
-from run_initialization_utils import get_floorplan_dataset_loader_eval, get_generator_from_checkpoint, \
+from utils.run_initialization_utils import get_floorplan_dataset_loader_eval, get_generator_from_checkpoint, \
     parse_input_options
 from utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
 

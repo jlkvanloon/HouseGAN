@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from floorplan_dataset_maps import is_adjacent
-from run_initialization_utils import parse_input_options, get_floorplan_dataset_loader_eval
+from utils.run_initialization_utils import parse_input_options, get_floorplan_dataset_loader_eval
 
 
 def return_eq(node1, node2):
