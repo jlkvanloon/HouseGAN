@@ -29,6 +29,7 @@ def make_sequence(given_nds, given_eds, noise):
         seq.append([curr_nds, curr_noise, curr_eds])
     return seq
 
+
 def draw_graph(g_true):
     # build true graph 
     G_true = nx.Graph()

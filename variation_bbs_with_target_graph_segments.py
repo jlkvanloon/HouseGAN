@@ -160,4 +160,3 @@ for k, im in enumerate(final_images):
     im.save('{}/{}.png'.format(path, k))
     if (k + 1) % 12 == 0:
         row += 1
-

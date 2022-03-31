@@ -15,16 +15,15 @@
 # limitations under the License.
 
 import random
-from torch.autograd import Variable
-import torch.nn.functional as F
-import torch
 
 import cv2
-
-import webcolors
 import numpy as np
+import torch
+import torch.nn.functional as F
+import webcolors
 from PIL import Image, ImageDraw, ImageOps, ImageFont
 from pygraphviz import *
+from torch.autograd import Variable
 from torchvision.utils import save_image
 
 from reconstruct import getAngle
@@ -512,6 +511,7 @@ def bb_to_img(bbs, graphs, room_to_sample, triple_to_sample, boundary_bb=None, m
 
     return imgs_tensor
 
+
 def mask_to_bb(mask):
     # get masks pixels
     inds = np.array(np.where(mask > 0))
@@ -819,6 +819,7 @@ def visualizeCorners(wallPoints):
     im_deb.save('./debug_all_corner_with_text.jpg')
     return
 
+
 def rectangle_renderer(theta, im_size=64):
     # scale theta
     theta = theta * im_size
@@ -860,6 +861,7 @@ def rectangle_renderer(theta, im_size=64):
     I = torch.max(torch.cat([line_1, line_2, line_3, line_4], -1), -1)[0]
 
     return I
+
 
 def checkpoint(real_room_bb, fake_room_bb, nodes, triples, room_to_sample, triple_to_sample, generator, exp_folder,
                batches_done, fake_validity, real_validity, boundary_bb, Tensor, latent_dim, out_imsize):
@@ -906,6 +908,7 @@ def checkpoint(real_room_bb, fake_room_bb, nodes, triples, room_to_sample, tripl
                                                                                                out_imsize)
     save_image(layouts_imgs_tensor_filtered, "{}/layouts_{}.png".format(exp_folder, batches_done), nrow=11)
 
+
 def combine_images_bbs(bbs_batch, im_size=256):
     bbs_batch = bbs_batch.view(-1, 10, 4).detach().cpu().numpy()
     all_imgs = []
@@ -924,6 +927,7 @@ def combine_images_bbs(bbs_batch, im_size=256):
                                      transpose(2, 0, 1)) / 255.0)
     all_imgs = torch.stack(all_imgs)
     return all_imgs
+
 
 def combine_images_maps(maps_batch, nodes_batch, edges_batch, \
                         nd_to_sample, ed_to_sample, im_size=256):
@@ -996,6 +1000,7 @@ def combine_images_maps(maps_batch, nodes_batch, edges_batch, \
                                           transpose(2, 0, 1)) / 255.0)
     all_imgs = torch.stack(all_imgs)
     return all_imgs
+
 
 def pad_im(cr_im, final_size=256):
     new_size = int(np.max([np.max(list(cr_im.size)), final_size]))

@@ -54,7 +54,7 @@ def draw_floorplan(dwg, junctions, juncs_on, lines_on):
     for k, l in lines_on:
         x1, y1 = np.array(junctions[k]) / 2.0
         x2, y2 = np.array(junctions[l]) / 2.0
-		# fill='rgb({},{},{})'.format(*(np.random.rand(3)*255).astype('int'))
+        # fill='rgb({},{},{})'.format(*(np.random.rand(3)*255).astype('int'))
         dwg.add(dwg.line((float(x1), float(y1)), (float(x2), float(y2)), stroke='black', stroke_width=4, opacity=0.5))
 
     # draw corners

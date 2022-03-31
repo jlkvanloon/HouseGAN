@@ -37,4 +37,3 @@ class CMP(nn.Module):
         enc_in = torch.cat([feats, pooled_v_pos, pooled_v_neg], 1)
         out = self.encoder(enc_in)
         return out
-

@@ -1,12 +1,16 @@
 # Source: https://gist.github.com/hyqneuron/caaf6087162f1c6361571ee489da260f
 
+from collections import defaultdict
+
+import graphviz
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
-from torch.nn import Parameter
-from torch.autograd import Variable, Function
-from collections import defaultdict
-import graphviz
 from graphviz import Digraph
+from matplotlib.lines import Line2D
+from torch.autograd import Function
+from torch.autograd import Variable
 
 """
 This is a rather distorted implementation of graph visualization in PyTorch.
@@ -26,8 +30,8 @@ To do graph visualization, follow these steps:
 4. perform visualization  : save_visualization(name, format='svg') # name is a string without extension
 """
 
-
 old_function__call__ = Function.__call__
+
 
 def register_creator(inputs, creator, output):
     """
@@ -40,7 +44,7 @@ def register_creator(inputs, creator, output):
     """
     cid = id(creator)
     oid = id(output)
-    if oid in vars: 
+    if oid in vars:
         return
     # connect creator to input
     for input in inputs:
@@ -55,19 +59,21 @@ def register_creator(inputs, creator, output):
     vars[oid] = output
     funcs[cid] = creator
 
+
 hooks = []
+
 
 def register_vis_hooks(model):
     global var_trace, func_trace, vars, funcs
     remove_vis_hooks()
-    var_trace  = defaultdict(lambda: {})     # map oid to {cid:creator}
-    func_trace = defaultdict(lambda: {})     # map cid to {iid:input}
-    vars  = {}                               # map vid to Variable/Parameter
-    funcs = {}                               # map cid to Function/BatchNorm module
-    hooks = []                               # contains the forward hooks, needed for hook removal
+    var_trace = defaultdict(lambda: {})  # map oid to {cid:creator}
+    func_trace = defaultdict(lambda: {})  # map cid to {iid:input}
+    vars = {}  # map vid to Variable/Parameter
+    funcs = {}  # map cid to Function/BatchNorm module
+    hooks = []  # contains the forward hooks, needed for hook removal
 
     def hook_func(module, inputs, output):
-        assert 'BatchNorm' in mod.__class__.__name__        # batchnorms don't have shared superclass
+        assert 'BatchNorm' in mod.__class__.__name__  # batchnorms don't have shared superclass
         inputs = list(inputs)
         for p in [module.weight, module.bias]:
             if p is not None:
@@ -75,12 +81,12 @@ def register_vis_hooks(model):
         register_creator(inputs, module, output)
 
     for mod in model.modules():
-        if 'BatchNorm' in mod.__class__.__name__:           # batchnorms don't have shared superclass
+        if 'BatchNorm' in mod.__class__.__name__:  # batchnorms don't have shared superclass
             hook = mod.register_forward_hook(hook_func)
             hooks.append(hook)
 
     def new_function__call__(self, *args, **kwargs):
-        inputs =  [a for a in args            if isinstance(a, Variable)]
+        inputs = [a for a in args if isinstance(a, Variable)]
         inputs += [a for a in kwargs.values() if isinstance(a, Variable)]
         output = old_function__call__(self, *args, **kwargs)
         register_creator(inputs, self, output)
@@ -98,9 +104,11 @@ def remove_vis_hooks():
 
 def save_visualization(name, format='svg'):
     g = graphviz.Digraph(format=format)
+
     def sizestr(var):
         size = [int(i) for i in list(var.size())]
         return str(size)
+
     # add variable nodes
     for vid, var in vars.iteritems():
         if isinstance(var, nn.Parameter):
@@ -123,10 +131,6 @@ def save_visualization(name, format='svg'):
             g.edge(str(cid), str(oid))
     g.render(name)
 
-from graphviz import Digraph
-import torch
-from torch.autograd import Variable
-
 
 def make_dot(var, params):
     """ Produces Graphviz representation of PyTorch autograd graph
@@ -141,7 +145,7 @@ def make_dot(var, params):
     """
     param_map = {id(v): k for k, v in params.items()}
     print(param_map)
-    
+
     node_attr = dict(style='filled',
                      shape='box',
                      align='left',
@@ -150,9 +154,9 @@ def make_dot(var, params):
                      height='0.2')
     dot = Digraph(node_attr=node_attr, graph_attr=dict(size="12,12"))
     seen = set()
-    
+
     def size_to_str(size):
-        return '('+(', ').join(['%d'% v for v in size])+')'
+        return '(' + (', ').join(['%d' % v for v in size]) + ')'
 
     def add_nodes(var):
         if var not in seen:
@@ -174,12 +178,11 @@ def make_dot(var, params):
                 for t in var.saved_tensors:
                     dot.edge(str(id(t)), str(id(var)))
                     add_nodes(t)
+
     add_nodes(var.grad_fn)
     return dot
 
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
+
 def plot_grad_flow(named_parameters):
     '''Plots the gradients flowing through different layers in the net during training.
     Can be used for checking for possible gradient vanishing / exploding problems.
@@ -187,19 +190,19 @@ def plot_grad_flow(named_parameters):
     Usage: Plug this function in Trainer class after loss.backwards() as 
     "plot_grad_flow(self.model.named_parameters())" to visualize the gradient flow'''
     ave_grads = []
-    max_grads= []
+    max_grads = []
     layers = []
     for n, p in named_parameters:
-        if(p.requires_grad) and ("bias" not in n):
+        if (p.requires_grad) and ("bias" not in n):
             layers.append(n)
             ave_grads.append(p.grad.abs().mean())
             max_grads.append(p.grad.abs().max())
     plt.bar(np.arange(len(max_grads)), max_grads, alpha=0.1, lw=1, color="c")
     plt.bar(np.arange(len(max_grads)), ave_grads, alpha=0.1, lw=1, color="b")
-    plt.hlines(0, 0, len(ave_grads)+1, lw=2, color="k" )
-    plt.xticks(range(0,len(ave_grads), 1), layers, rotation="vertical")
+    plt.hlines(0, 0, len(ave_grads) + 1, lw=2, color="k")
+    plt.xticks(range(0, len(ave_grads), 1), layers, rotation="vertical")
     plt.xlim(left=0, right=len(ave_grads))
-    plt.ylim(bottom = -0.001, top=0.02) # zoom in on the lower gradient regions
+    plt.ylim(bottom=-0.001, top=0.02)  # zoom in on the lower gradient regions
     plt.xlabel("Layers")
     plt.ylabel("average gradient")
     plt.title("Gradient flow")

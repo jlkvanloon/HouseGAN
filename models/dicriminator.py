@@ -53,4 +53,3 @@ class Discriminator(nn.Module):
 
         # local loss
         return validity_global
-

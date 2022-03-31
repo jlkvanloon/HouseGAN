@@ -4,9 +4,8 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
-from utils.run_initialization_utils import parse_input_options, get_generator_from_checkpoint, get_floorplan_dataset_loader_eval
-
-
+from utils.run_initialization_utils import parse_input_options, get_generator_from_checkpoint, \
+    get_floorplan_dataset_loader_eval
 # Create folder
 from utils.utils import mask_to_bb, bb_to_im_fid
 
