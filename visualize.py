@@ -1,43 +1,18 @@
-import argparse
 import os
-import numpy as np
-import math
-import sys
-import random
 
-import torchvision.transforms as transforms
+import numpy as np
+import torch
+from floorplan_dataset_no_masks import FloorplanGraphDataset, floorplan_collate_fn
+from input_graphs import *
+from torch.autograd import Variable
+from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 
-from floorplan_dataset_no_masks import FloorplanGraphDataset, floorplan_collate_fn
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torch.autograd import Variable
-from graph import GraphTripleConv, GraphTripleConvNet
-
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
-import torch
-
 from models.generator import Generator
-from utils import bb_to_img, bb_to_vec, bb_to_seg
-from PIL import Image, ImageDraw
-from MyIP import reconstructFloorplan
-import svgwrite
-from input_graphs import *
+from run_initialization_utils import parse_input_options
+from utils import bb_to_img
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
-parser.add_argument("--latent_dim", type=int, default=20, help="dimensionality of the latent space")
-parser.add_argument("--batch_size", type=int, default=2, help="size of the batches")
-parser.add_argument("--img_size", type=int, default=4, help="size of each image dimension")
-parser.add_argument("--channels", type=int, default=1, help="number of image channels")
-parser.add_argument("--with_boundary", action='store_true', default=True, help="include floorplan footprint")
-parser.add_argument("--num_variations", type=int, default=10, help="number of variations")
-parser.add_argument("--exp_folder", type=str, default='exp', help="destination folder")
-parser.add_argument("--checkpoint", type=str, default='checkpoints/gen_neighbour_exp_10_nodes_train_split_1000000.pth', help="destination folder")
-opt = parser.parse_args()
-print(opt)
+opt = parse_input_options()
 
 def draw_floorplan(dwg, junctions, juncs_on, lines_on):
 

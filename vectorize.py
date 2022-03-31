@@ -22,20 +22,14 @@ from PIL import Image, ImageDraw
 from models.generator import Generator
 from reconstruct import reconstructFloorplan
 import svgwrite
+
+from run_initialization_utils import parse_input_options
 from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, remove_junctions, ID_COLOR, pad_im
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import networkx as nx
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
-parser.add_argument("--latent_dim", type=int, default=128, help="dimensionality of the latent space")
-parser.add_argument("--batch_size", type=int, default=1, help="size of the batches")
-parser.add_argument("--channels", type=int, default=1, help="number of image channels")
-parser.add_argument("--num_variations", type=int, default=8, help="number of variations")
-parser.add_argument("--exp_folder", type=str, default='exp', help="destination folder")
-
-opt = parser.parse_args()
+opt = parse_input_options()
 IM_SIZE = 256
 print(opt)
 

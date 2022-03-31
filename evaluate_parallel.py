@@ -11,19 +11,11 @@ from tqdm import tqdm
 
 from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn, is_adjacent
 from models.generator import Generator
+from run_initialization_utils import parse_input_options
 from utils import ID_COLOR
 from utils import mask_to_bb
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
-parser.add_argument("--latent_dim", type=int, default=128, help="dimensionality of the latent space")
-parser.add_argument("--batch_size", type=int, default=1, help="size of the batches - does not support larger batchs")
-parser.add_argument("--img_size", type=int, default=32, help="size of each image dimension")
-parser.add_argument("--with_boundary", action='store_true', default=True, help="include floorplan footprint")
-parser.add_argument("--num_variations", type=int, default=10, help="number of variations")
-parser.add_argument("--checkpoint", type=str, default='', help="destination folder") 
-parser.add_argument("--target_set", type=str, default='A', help="which split to remove")
-opt = parser.parse_args()
+opt = parse_input_options()
 
 def return_eq(node1, node2):
     return node1['label']==node2['label']

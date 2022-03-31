@@ -19,6 +19,7 @@ import torch.autograd as autograd
 import torch
 
 from models.generator import Generator
+from run_initialization_utils import parse_input_options
 from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, draw_graph
 from PIL import Image, ImageDraw
 from reconstruct import reconstructFloorplan
@@ -30,17 +31,7 @@ from utils import ID_COLOR
 from tqdm import tqdm
 from collections import defaultdict
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
-parser.add_argument("--latent_dim", type=int, default=128, help="dimensionality of the latent space")
-parser.add_argument("--batch_size", type=int, default=1, help="size of the batches - does not support larger batchs")
-parser.add_argument("--img_size", type=int, default=32, help="size of each image dimension")
-parser.add_argument("--with_boundary", action='store_true', default=True, help="include floorplan footprint")
-parser.add_argument("--num_variations", type=int, default=10, help="number of variations")
-parser.add_argument("--exp_folder", type=str, default='exp', help="destination folder")
-
-opt = parser.parse_args()
-print(opt)
+opt = parse_input_options()
 
 numb_iters = 200000
 exp_name = 'exp_with_graph_global_new'
