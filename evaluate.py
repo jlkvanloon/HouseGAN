@@ -10,7 +10,7 @@ from tqdm import tqdm
 from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn
 from floorplan_dataset_maps import is_adjacent
 from utils.run_initialization_utils import parse_input_options, get_generator_from_checkpoint
-from utils import ID_COLOR
+from utils.utils import ID_COLOR
 
 
 def return_eq(node1, node2):

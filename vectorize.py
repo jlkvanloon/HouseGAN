@@ -16,7 +16,7 @@ from reconstruct import reconstructFloorplan
 import svgwrite
 
 from utils.run_initialization_utils import parse_input_options
-from utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, pad_im
+from utils.utils import bb_to_img, bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, pad_im
 import matplotlib.pyplot as plt
 import networkx as nx
 

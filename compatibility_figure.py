@@ -9,7 +9,7 @@ from torch.autograd import Variable
 
 from utils.run_initialization_utils import get_generator_from_checkpoint, parse_input_options, \
     get_floorplan_dataset_loader_eval
-from utils import mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
+from utils.utils import mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
 
 
 def make_sequence(given_nds, given_eds, noise):

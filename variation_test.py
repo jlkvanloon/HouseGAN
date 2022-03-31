@@ -11,10 +11,10 @@ import torch
 
 from models.generator import Generator
 from utils.run_initialization_utils import parse_input_options
-from utils import mask_to_bb, draw_graph
+from utils.utils import mask_to_bb, draw_graph
 from PIL import Image, ImageDraw
 
-from utils import ID_COLOR
+from utils.utils import ID_COLOR
 from tqdm import tqdm
 
 opt = parse_input_options()

@@ -14,22 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json, os, random, math
+import random
 from collections import defaultdict
 
-import torch
-from torch.utils.data import Dataset
-import torchvision.transforms as T
-import math
-import numpy as np
 import PIL
-from skimage.transform import resize as imresize
-import pycocotools.mask as mask_utils
-import glob
-from PIL import Image, ImageDraw, ImageOps
-import matplotlib.pyplot as plt
-import random
-from utils import mask_to_bb, ROOM_CLASS
+import numpy as np
+import torch
+from PIL import Image
+from torch.utils.data import Dataset
+
 sets = {'A':[1, 3], 'B':[4, 6], 'C':[7, 9], 'D':[10, 12], 'E':[13, 100]}
 
 def filter_graphs(graphs, min_h=0.03, min_w=0.03):

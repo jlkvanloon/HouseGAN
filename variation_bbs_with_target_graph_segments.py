@@ -11,7 +11,7 @@ from torch.autograd import Variable
 
 from utils.run_initialization_utils import parse_input_options, get_generator_from_checkpoint, \
     get_floorplan_dataset_loader_eval
-from utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
+from utils.utils import bb_to_vec, bb_to_seg, mask_to_bb, ID_COLOR, bb_to_im_fid, pad_im
 
 
 def draw_graph(g_true):

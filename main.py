@@ -1,26 +1,19 @@
 import argparse
 import os
-import numpy as np
-import math
 
-from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn
+import numpy as np
+import torch
+import torch.nn as nn
 import torchvision.transforms as transforms
+from torch.autograd import Variable
+from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torch.autograd import Variable
-import torch.autograd as autograd
-
-import torch.nn as nn
-import torch.nn.functional as F
-import torch
-from PIL import Image, ImageDraw, ImageOps
-
+from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn
 from models.dicriminator import Discriminator
 from models.generator import Generator
 from models.gradient_penalty import compute_gradient_penalty
-from utils import combine_images_maps, rectangle_renderer
+from utils.utils import combine_images_maps
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_epochs", type=int, default=1000000, help="number of epochs of training")

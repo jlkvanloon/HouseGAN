@@ -11,8 +11,8 @@ from tqdm import tqdm
 from floorplan_dataset_maps import FloorplanGraphDataset, floorplan_collate_fn, is_adjacent
 from models.generator import Generator
 from utils.run_initialization_utils import parse_input_options
-from utils import ID_COLOR
-from utils import mask_to_bb
+from utils.utils import ID_COLOR
+from utils.utils import mask_to_bb
 
 opt = parse_input_options()
 

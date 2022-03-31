@@ -1,15 +1,8 @@
+from collections import defaultdict
+
 import cv2
 import numpy as np
-import sys
-import csv
-import copy
-from utils import *
-from PIL import Image, ImageDraw, ImageOps, ImageFilter
-import matplotlib.pyplot as plt
-# from utils.intersections import doIntersect
-from skimage import measure
-from collections import defaultdict
-import svgwrite
+from PIL import Image, ImageDraw
 
 
 def snap_corners(cs, ths=[4, 8]):
